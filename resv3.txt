@@ -1,0 +1,88 @@
+Sub getDataFromOutlook()
+Dim OutlookApp As Outlook.Application
+Dim OutlookNamespace As Namespace
+Dim Folder As MAPIFolder
+Dim OutlookMail As Variant
+Dim i As Integer
+
+Dim str As String
+Dim strArr() As String
+Dim strArr2() As String
+Dim strArr3() As String
+
+Set OutlookApp = New Outlook.Application
+
+Set OutlookNamespace = OutlookApp.GetNamespace("MAPI")
+
+Set Folder = OutlookNamespace.GetDefaultFolder(olFolderInbox).Folders("impMail")
+
+i = 1
+
+For Each OutlookMail In Folder.Items
+    If OutlookMail.ReceivedTime >= Range("email_Receipt_start_Date2").Value Then
+        If OutlookMail.SenderName = Range("sender_name").Value Then
+            str = OutlookMail.Subject
+            strArr = Split(str, "/")
+            Range("email_subject1").Offset(i, 0).Value = strArr(1)
+            Range("email_subject1").Offset(i, 0).Columns.AutoFit
+            Range("email_subject1").Offset(i, 0).VerticalAlignment = xlTop
+        
+            Range("email_subject2").Offset(i, 0).Value = strArr(0)
+            Range("email_subject2").Offset(i, 0).Columns.AutoFit
+            Range("email_subject2").Offset(i, 0).VerticalAlignment = xlTop
+            
+            strArr2 = Split(strArr(2), " - ")
+            
+            Range("email_subject3").Offset(i, 0).Value = strArr2(0)
+            Range("email_subject3").Offset(i, 0).Columns.AutoFit
+            Range("email_subject3").Offset(i, 0).VerticalAlignment = xlTop
+            
+            Range("email_subject4").Offset(i, 0).Value = strArr2(1)
+            Range("email_subject4").Offset(i, 0).Columns.AutoFit
+            Range("email_subject4").Offset(i, 0).VerticalAlignment = xlTop
+            
+            Range("email_subject5").Offset(i, 0).Value = strArr2(2)
+            Range("email_subject5").Offset(i, 0).Columns.AutoFit
+            Range("email_subject5").Offset(i, 0).VerticalAlignment = xlTop
+            If strArr2(2) = "FAILURE" Then
+                Range("email_subject5").Offset(i, 0).Interior.ColorIndex = 3
+            End If
+            
+            Range("end_date").Offset(i, 0).Value = OutlookMail.ReceivedTime
+            Range("end_date").Offset(i, 0).Columns.AutoFit
+            Range("end_date").Offset(i, 0).VerticalAlignment = xlTop
+            
+            Range("email_Sender").Offset(i, 0).Value = OutlookMail.SenderName
+            Range("email_Sender").Offset(i, 0).Columns.AutoFit
+            Range("email_Sender").Offset(i, 0).VerticalAlignment = xlTop
+            
+            str = OutlookMail.Body
+            strArr2 = Split(str, ":")
+            strArr3 = Split(strArr2(8), "CHANGES")
+            Range("email_Body").Offset(i, 0).Value = strArr3(0)
+            Range("email_Body").Offset(i, 0).Columns.AutoFit
+            Range("email_Body").Offset(i, 0).VerticalAlignment = xlTop
+            
+            strArr3 = Split(strArr2(6), "Duration")
+            
+            Range("start_date").Offset(i, 0).Value = strArr2(4) + ":" + strArr2(5) + ":" + strArr3(0)
+            Range("start_date").Offset(i, 0).Columns.AutoFit
+            Range("start_date").Offset(i, 0).VerticalAlignment = xlTop
+            
+            strArr3 = Split(strArr2(7), "Cause")
+            
+            Range("run_time").Offset(i, 0).Value = strArr3(0)
+            Range("run_time").Offset(i, 0).Columns.AutoFit
+            Range("run_time").Offset(i, 0).VerticalAlignment = xlTop
+            
+            i = i + 1
+        End If
+    End If
+
+Next OutlookMail
+
+Set Folder = Nothing
+Set OutlookNamespace = Nothing
+Set OutlookApp = Nothing
+
+End Sub
